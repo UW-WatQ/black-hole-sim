@@ -1,5 +1,5 @@
 from qiskit import QuantumCircuit
-from qiskit.quantum_info import Statevector, partial_trace
+from qiskit.quantum_info import Statevector, partial_trace, entropy
 import numpy as np
 import matplotlib.pyplot as plt
 
