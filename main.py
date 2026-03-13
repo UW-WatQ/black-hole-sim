@@ -3,6 +3,7 @@ from qiskit.quantum_info import Statevector, partial_trace, entropy
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 # Create n pairs of Hawking radiation particles
 def generate_pairs(n_pairs):
     # Create circuit of 2n qubits
@@ -16,9 +17,10 @@ def generate_pairs(n_pairs):
         # Superposition
         qc.h(ext)
         # Entanglement
-        qc.cx (ext, int)
+        qc.cx(ext, int)
 
     return qc
+
 
 # Apply one timestep of evolution to qubits
 def evolve_radiation(qc, n_pairs, timestep):
@@ -31,11 +33,12 @@ def evolve_radiation(qc, n_pairs, timestep):
 
     # Interaction between particles (nearest neighbour)
     for i in range(0, 2 * n_pairs - 2, 2):
-        # Simulate chaotic mixing of particles 
+        # Simulate chaotic mixing of particles
         qc.cx(i, i + 2)
         qc.rz(0.2 * np.random.random(), i)
 
     return qc
+
 
 # Incrementally create pairs up to specified max and evolve system by specified timesteps
 def time_evolution(max_pairs, timesteps):
@@ -53,11 +56,12 @@ def time_evolution(max_pairs, timesteps):
         state = Statevector(qc)
         keep_qubits = [i * 2 for i in range(n)]
         ext_state = partial_trace(state, keep_qubits)
-        entropy = entropy(ext_state, base=2)
+        epy = entropy(ext_state, base=2)
 
-        entropies.append(entropy)
+        entropies.append(epy)
 
     return entropies
+
 
 # Model continuous emission of Hawking radiation
 def continuous_emission_model(total_time, emission_rate):
@@ -67,7 +71,7 @@ def continuous_emission_model(total_time, emission_rate):
     # Operate for given time
     for t in range(total_time):
         # Randomly add new pair of qubits to circuit
-        if (np.random.random() < emission_rate):
+        if np.random.random() < emission_rate:
             new_qc = QuantumCircuit(qc.num_qubits + 2)
             new_qc.compose(qc, range(qc.num_qubits), inplace=True)
 
@@ -82,18 +86,18 @@ def continuous_emission_model(total_time, emission_rate):
             qc = new_qc
 
         # Evolve system
-        if (qc.num_qubits > 0):
+        if qc.num_qubits > 0:
             qc = evolve_radiation(qc, qc.num_qubits // 2, t)
 
         # Measure entropy
-        if (qc.num_qubits > 0):
+        if qc.num_qubits > 0:
             state = Statevector(qc)
             n_pairs = qc.num_qubits // 2
             keep = [2 * i for i in range(n_pairs)]
             ext_state = partial_trace(state, keep)
-            entropy = entropy(ext_state, base=2)
+            epy = entropy(ext_state, base=2)
 
-            entropies.append(entropy)
+            entropies.append(epy)
         else:
             entropies.append(0)
 
